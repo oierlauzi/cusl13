@@ -1,0 +1,5 @@
+\frametitle{Programa "¡Hola Mundo!"}
+
+\lstset{escapechar=@,style=micpp}
+\lstinputlisting{HolaMundo.cpp}
+

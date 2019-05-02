@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{Introducci\IeC {\'o}n}{2}{0}{1}
+\beamer@sectionintoc {2}{E/S disponible y "procesadores"}{6}{0}{2}
+\beamer@sectionintoc {3}{Documentaci\IeC {\'o}n}{18}{0}{3}
+\beamer@sectionintoc {4}{Ejemplos}{21}{0}{4}
+\beamer@sectionintoc {5}{Conclusiones}{30}{0}{5}
