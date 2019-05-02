@@ -1,5 +1,173 @@
-\frametitle{Programa "¡Hola Mundo!"}
+\frametitle{Dináminca de flujo}
+	\begin{figure} {Un "Consumer" puede ser alimentado de un "Source"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)									{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
 
-\lstset{escapechar=@,style=micpp}
-\lstinputlisting{HolaMundo.cpp}
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
 
+			%Lineas
+			\draw[Flecha] (source_src.east) -- (consumer_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			FooSource source;
+			FooConsumer consumer;
+		
+			//Los 3 son equivalentes
+			consumer.consumerPad << source.sourcePad;
+			source.sourcePad >> consumer.consumerPad;
+			consumer.setSource(&source.sourcePad);
+		\end{lstlisting}
+	\end{figure}
+	
+	\begin{figure} {Los elementos pueden estar sin "conectarse"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)									{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << nullptr; //Para dejar de alimentar un Consumer
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Un "Source" puede alimentar varios "Consumer"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)										{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]			{sourcePad};
+
+			\node[ConsumerPad]	(consumer1_cons)	[above right=10mm of source_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer1)		[right=0cm of consumer1_cons]	{Consumer1};
+
+			\node[ConsumerPad]	(consumer2_cons)	[below right=10mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer2)		[right=0cm of consumer2_cons]	{Consumer2};
+
+			%Lineas
+			\draw[Flecha] (source_src.east) -- (consumer1_cons.west);
+			\draw[Flecha] (source_src.east) -- (consumer2_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer1.consumerPad << source.sourcePad;
+			consumer2.consumerPad << source.sourcePad;
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure} {Puede haber varios "pipelines" independientes}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source1)									{Source1};
+			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{sourcePad};
+
+			\node[ZuazoBase]		(source2)			[below =1cm of source1]		{Source2};
+			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer1_cons)	[right=10mm of source1_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer1)		[right=0cm of consumer1_cons]{Consumer1};
+
+			\node[ConsumerPad]	(consumer2_cons)	[right=10mm of source2_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer2)		[right=0cm of consumer2_cons]{Consumer2};
+
+			%Lineas
+			\draw[Flecha] (source1_src.east) -- (consumer1_cons.west);
+			\draw[Flecha] (source2_src.east) -- (consumer2_cons.west);
+
+		\end{tikzpicture}
+
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer1.consumerPad << source1.sourcePad;
+			consumer2.consumerPad << source2.sourcePad;
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Los "pipelines" pueden tener cualquier longitud}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)									{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+
+			\node[ConsumerPad]	(processor_cons) 	[right = 4mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(processor)		[right = 0cm of processor_cons]	{Processor};
+			\node[SourcePad]		(processor_src)		[right = 0cm of processor)]	{sourcePad};	
+
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of processor_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+			%Lineas
+			\draw[Flecha] (source_src.east) -- (processor_cons.west);
+			\draw[Flecha] (processor_src.east) -- (consumer_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << processor.sourcePad;
+			processor.consumerPad << source.sourcePad;
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Los "pipelines" pueden tener recursividad (hasta un nivel finito)}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ConsumerPad]	(processor1_cons) 								{consumerPad};
+			\node[ZuazoBase]		(processor1)		[right = 0cm of processor1_cons]	{Processor1};
+			\node[SourcePad]		(processor1_src)	[right = 0cm of processor1)]		{sourcePad};	
+
+			\node[ConsumerPad]	(processor2_cons) 	[below = 2cm of processor1_cons]	{consumerPad};
+			\node[ZuazoBase]		(processor2)		[right = 0cm of processor2_cons]	{Processor2};
+			\node[SourcePad]		(processor2_src)	[right = 0cm of processor2)]		{sourcePad};	
+
+			\node[ConsumerPad]	(consumer_cons)	[right=3cm of processor1_src]		{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]		{Consumer};
+
+			%Lineas
+			\draw[Flecha] (processor2_src.east) -- (processor1_cons.west);
+			\draw[Flecha] (processor1_src.east) -- (processor2_cons.west);
+			\draw[Flecha] (processor1_src.east) -- (consumer_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << processor1.sourcePad;
+			processor1.consumerPad << processor2.sourcePad;
+			processor2.consumerPad << processor1.sourcePad;
+			processor1.setMaxRecursion(10);
+			processor2.setMaxRecursion(10); //En caso de ser distinto, se escojera el minimo
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Un "Consumer" \textbf{NO} puede tener varios "Source"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source1)									{Source1};
+			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{sourcePad};
+
+			\node[ZuazoBase]		(source2)			[below =0.25cm of source1]		{Source2};
+			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer_cons)	[right=10mm of source1_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+			%Lineas
+			\draw[Flecha] (source1_src.east) -- (consumer_cons.west);
+			\draw[Flecha] (source2_src.east) -- (consumer_cons.west);
+			
+			%X
+			\node[above right = 3mm of source2] (a) {};
+			\node[below left = 3mm of source2] (b) {};
+			\node[above left = 3mm of source2] (c) {};
+			\node[below right = 3mm of source2] (d) {};
+			\draw[-, color=red, line width=4] (a) -- (b);
+			\draw[-, color=red, line width=4] (c) -- (d);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << source1.sourcePad; //No sirve para nada, ya que acto seguido se "machacara"
+			consumer.consumerPad << source2.sourcePad; //Aqui se "machaca" la fuente anterior
+		\end{lstlisting}
+	\end{figure}

@@ -3,7 +3,11 @@
 %Paquetes a usar
 \usepackage{hyperref}
 \usepackage{listings}
+\usepackage{verbatim}
 \usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
 
 %Configuración del tema
 \usetheme{Madrid}
@@ -41,6 +45,12 @@
 	}
 }
 
+%Estilo Tikz
+\tikzstyle{SourcePad}=[rectangle, draw=red!60, fill=red!5, thick, minimum height=3mm, font=\tiny]
+\tikzstyle{ConsumerPad}=[rectangle, draw=green!60, fill=green!5, thick, minimum height=3mm, font=\tiny]
+\tikzstyle{ZuazoBase}=[rectangle, draw=blue!60, fill=blue!5, very thick, minimum width=18mm, minimum height=18mm, font=\large]
+\tikzstyle{Flecha}=[->, line width=1.5]
+
 %Directorio de gráficos
 \graphicspath{ {../images/} }
 
@@ -63,6 +73,8 @@
   		\tableofcontents[currentsection]
 	\end{frame}
 }
+
+\beamertemplatenavigationsymbolsempty
 
 %Comenzamos con la presentación
 \begin{document}
@@ -91,10 +103,31 @@
 		\item{Escrita en C++17, incluyendo la API}
 		\item{Soporta distribuciones GNU/Linux basadas en Debian} 
 		\item{Emplea aceleración por GPU en la medida de lo posible}
+		\item{Es seguro en hilos (thread safe)}
+		\item{Relativamente fácil de usar}
 	\end{itemize}
 \end{frame}
 
-%Librerias
+%¿Por que decidí empezar Zuazo?
+\begin{frame} \frametitle{¿Por que decidí empezar Zuazo?}
+	\begin{block}{Ya existían alternativas}
+		\begin{itemize}
+			\item{MLT (Media Lovin' Toolkit)}
+			\item{GStreamer}
+			\item{\ldots}
+		\end{itemize}
+	\end{block}
+	\textbf{Entonces, ¿Por qué?}
+	\begin{itemize}
+		\item{Falta de documentación (MLT)}
+		\item{Diseñada para C, API compleja (GStreamer)}
+		\item{Sin énfasis en manipular video por hardware (Ambas)} 
+		\item{Sin énfasis en tiempo real (MLT)} 
+		\item{Ganas de hacer un proyecto relacionado con manipulación de video}
+	\end{itemize}
+\end{frame}
+
+%Librerias de terceros
 \begin{frame} \frametitle{Librerías de terceros}
 	\begin{itemize}
 		\item{Librería estándar de C++}
@@ -107,9 +140,235 @@
 	\end{itemize}
 \end{frame}
 
-%Dinámica
-\begin{frame} \frametitle{Dináminca}
-	%TODO
+
+%
+% Dinámica de Zuazo
+%
+\section{Dinámica de Zuazo}
+
+\begin{frame}[allowframebreaks, fragile] \frametitle{Dináminca general}
+	\begin{figure}
+		 \begin{itemize}
+			\item{Todo se encuentra en el espacio de nombres (o en un subespacio de nombres de)  \texttt{Zuazo}, o abreviado \texttt{zz}}	
+			\item{Para poder empezar a usar Zuazo, hay que inicializarlo con \texttt{Zuazo::init()}} 
+			\item{Al terminar, conviene liberar todo con \texttt{Zuazo::terminate()} (No hacerlo es de malas personas)} 
+			\item{Antes de llamar a \texttt{Zuazo::terminate()} \textbf{TODOS} los objetos de Zuazo deben haberse destruido o cerrado} 
+			\item{\textbf{TODOS} los comandos (excepto  \texttt{init()} y  \texttt{terminate()}) se deben de ordenar entre un  \texttt{begin()} y un  \texttt{end()} o equivalente, que llamaremos "contexto"}
+			\item{Declarar un objeto de la clase \texttt{zz::Context}, es equivalente a hacer \texttt{begin()} y \texttt{end()} (Cuando  \texttt{zz::Context} se construye se ejecuta  \texttt{begin()} y cuando se destruye se ejecuta  \texttt{end()})}
+			\item{Sólo puede haber un contexto activo en todo momento (está protegido con un mutex)} 
+			\item{Mientras que haya un contexto activo, el renderizado de Zuazo estará pausado (minimizar tiempo con contexto activo)} 	
+			\item{Todos los cambios realizados en un mismo contexto ocurrirán en un mismo fotograma} 
+		\end{itemize}
+		\begin{lstlisting}[style=micpp, frame=single]
+			zz::init(); //Inicializa Zuazo
+
+			zz::begin(); //Comenzamos a ordernar cosas a Zuazo
+			//[...]
+			zz::end(); //Hemos terminado de momento
+
+			if(){
+				zz::Context ctx; //La vida de este objeto representa un begin() y end()
+				//[...]
+			}
+
+			zz:terminate();//Libera todos los recursos adquiridos por Zuazo
+		\end{lstlisting}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[allowframebreaks, fragile] \frametitle{Dináminca de flujo}
+	\begin{figure} {Un "Consumer" puede ser alimentado de un "Source"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)									{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+			%Lineas
+			\draw[Flecha] (source_src.east) -- (consumer_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			FooSource source;
+			FooConsumer consumer;
+		
+			//Los 3 son equivalentes
+			consumer.consumerPad << source.sourcePad;
+			source.sourcePad >> consumer.consumerPad;
+			consumer.setSource(&source.sourcePad);
+		\end{lstlisting}
+	\end{figure}
+	
+	\begin{figure} {Los elementos pueden estar sin "conectarse"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)									{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << nullptr; //Para dejar de alimentar un Consumer
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Un "Source" puede alimentar varios "Consumer"}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)										{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]			{sourcePad};
+
+			\node[ConsumerPad]	(consumer1_cons)	[above right=10mm of source_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer1)		[right=0cm of consumer1_cons]	{Consumer1};
+
+			\node[ConsumerPad]	(consumer2_cons)	[below right=10mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer2)		[right=0cm of consumer2_cons]	{Consumer2};
+
+			%Lineas
+			\draw[Flecha] (source_src.east) -- (consumer1_cons.west);
+			\draw[Flecha] (source_src.east) -- (consumer2_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer1.consumerPad << source.sourcePad;
+			consumer2.consumerPad << source.sourcePad;
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure} {Puede haber varios "pipelines" independientes}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source1)									{Source1};
+			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{sourcePad};
+
+			\node[ZuazoBase]		(source2)			[below =1cm of source1]		{Source2};
+			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer1_cons)	[right=10mm of source1_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer1)		[right=0cm of consumer1_cons]{Consumer1};
+
+			\node[ConsumerPad]	(consumer2_cons)	[right=10mm of source2_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer2)		[right=0cm of consumer2_cons]{Consumer2};
+
+			%Lineas
+			\draw[Flecha] (source1_src.east) -- (consumer1_cons.west);
+			\draw[Flecha] (source2_src.east) -- (consumer2_cons.west);
+
+		\end{tikzpicture}
+
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer1.consumerPad << source1.sourcePad;
+			consumer2.consumerPad << source2.sourcePad;
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Los "pipelines" pueden tener cualquier longitud}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source)									{Source};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+
+			\node[ConsumerPad]	(processor_cons) 	[right = 4mm of source_src]	{consumerPad};
+			\node[ZuazoBase]		(processor)		[right = 0cm of processor_cons]	{Processor};
+			\node[SourcePad]		(processor_src)		[right = 0cm of processor)]	{sourcePad};	
+
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of processor_src]	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+			%Lineas
+			\draw[Flecha] (source_src.east) -- (processor_cons.west);
+			\draw[Flecha] (processor_src.east) -- (consumer_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << processor.sourcePad;
+			processor.consumerPad << source.sourcePad;
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Los "pipelines" pueden tener recursividad (hasta un nivel finito)}
+		\begin{tikzpicture}
+			%Nodos
+			\node[ConsumerPad]	(processor1_cons) 								{consumerPad};
+			\node[ZuazoBase]		(processor1)		[right = 0cm of processor1_cons]	{Processor1};
+			\node[SourcePad]		(processor1_src)	[right = 0cm of processor1)]		{sourcePad};	
+
+			\node[ConsumerPad]	(processor2_cons) 	[below = 2cm of processor1_cons]	{consumerPad};
+			\node[ZuazoBase]		(processor2)		[right = 0cm of processor2_cons]	{Processor2};
+			\node[SourcePad]		(processor2_src)	[right = 0cm of processor2)]		{sourcePad};	
+
+			\node[ConsumerPad]	(consumer_cons)	[right=3cm of processor1_src]		{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]		{Consumer};
+
+			%Lineas
+			\draw[Flecha] (processor2_src.east) -- (processor1_cons.west);
+			\draw[Flecha] (processor1_src.east) -- (processor2_cons.west);
+			\draw[Flecha] (processor1_src.east) -- (consumer_cons.west);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << processor1.sourcePad;
+			processor1.consumerPad << processor2.sourcePad;
+			processor2.consumerPad << processor1.sourcePad;
+			processor1.setMaxRecursion(10);
+			processor2.setMaxRecursion(10); //En caso de ser distinto, se escojera el minimo
+		\end{lstlisting}
+	\end{figure}
+
+	\begin{figure}  {Un "Consumer" \textbf{NO} puede tener varios "Source"} 
+		\begin{tikzpicture}
+			%Nodos
+			\node[ZuazoBase]		(source1)									{Source1};
+			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{sourcePad};
+
+			\node[ZuazoBase]		(source2)			[below =0.25cm of source1]		{Source2};
+			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{sourcePad};
+
+			\node[ConsumerPad]	(consumer_cons)	[right=10mm of source1_src] 	{consumerPad};
+			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
+
+			%Lineas
+			\draw[Flecha] (source1_src.east) -- (consumer_cons.west);
+			\draw[Flecha] (source2_src.east) -- (consumer_cons.west);
+			
+			%X
+			\node[above right = 3mm of source2] (a) {};
+			\node[below left = 3mm of source2] (b) {};
+			\node[above left = 3mm of source2] (c) {};
+			\node[below right = 3mm of source2] (d) {};
+			\draw[-, color=red, line width=4] (a) -- (b);
+			\draw[-, color=red, line width=4] (c) -- (d);
+
+		\end{tikzpicture}
+		\begin{lstlisting}[style=micpp, frame=single]
+			consumer.consumerPad << source1.sourcePad; //No sirve para nada, ya que acto seguido se "machacara"
+			consumer.consumerPad << source2.sourcePad; //Aqui se "machaca" la fuente anterior
+		\end{lstlisting}
+	\end{figure}
+\end{frame}
+
+%
+% Documentación
+%
+\section{Documentación}
+
+%Documentación
+\begin{frame} \frametitle{Documentación}
+	\includegraphics[width=\textwidth]{doxy1} 
+\end{frame}
+
+\begin{frame}[allowframebreaks] \frametitle{API general del video}
+\begin{center}
+	\includegraphics[height=0.8\textheight]{video_base1} 
+	\includegraphics[width=\textwidth]{video_base2} 
+	\includegraphics[height=0.8\textheight]{video_mode_struct} 
+	\includegraphics[width=\textwidth]{video_consumer} 
+	\includegraphics[height=0.8\textheight]{scaling} 
+\end{center}
 \end{frame}
 
 %
@@ -147,15 +406,13 @@
 	\end{itemize}
 \end{frame}
 
-%
-% Documentación
-%
-\section{Documentación}
-
-%Documentación
-\begin{frame}[allowframebreaks] \frametitle{Documentación}
-	\includegraphics[width=\textwidth]{doxy1} 
-	\includegraphics[width=\textwidth]{doxy2}
+%Compositor
+\begin{frame}[t] \frametitle{Compositor}
+	\begin{itemize}
+		\item{Combina varias fuentes en una sola salida} \pause
+		\item{Se organiza en capas}  \pause
+		\item{Entorno 3D: Cámara y capas transformables en el espacio}
+	\end{itemize}
 \end{frame}
 
 %
@@ -176,6 +433,20 @@
 	\lstinputlisting[style=micpp]{../code/CuantizarApp.cpp}	
 \end{frame}
 
+%
+% Aplicaciones
+%
+\section{Aplicaciones}
+
+%Posibles aplicaciones
+\begin{frame} \frametitle{Posibles aplicaciones}
+	%TODO
+\end{frame}
+
+%Pero, ¿Se pueden hacer memes?
+\begin{frame} \frametitle{Pero, ¿Se pueden hacer memes?}
+	%TODO
+\end{frame}
 
 %
 % Conclusiones
@@ -208,6 +479,34 @@
 		\item{Organización del CUSL}
 		\item{Mis padres, familia y amigos}
 	\end{itemize}
+\end{frame}
+
+%Muchas gracias
+\begin{frame}[plain]
+	\begin{columns}
+		\column{0.5\textwidth} \includegraphics[width=\textwidth]{zuazo_logo}
+		\column{0.5\textwidth} \includegraphics[width=\textwidth]{cusl13_logo}
+	\end{columns}
+	\bigskip\bigskip
+	\begin{center} \bf\color{blue}\Huge
+		Eskerrik asko
+	\end{center}
+	\begin{center} \bf\color{blue}\Huge
+		(Muchas gracias)
+	\end{center}
+	\bigskip\bigskip
+	\begin{columns}
+		\begin{column}{0.48\textwidth}
+			\begin{block}{\footnotesize Diapositivas y el código mostrado}
+				\tiny\url{https://github.com/oierlauzi/zuazo-cusl13}
+			\end{block}
+		\end{column}
+		\begin{column}{0.48\textwidth}
+			\begin{block}{\footnotesize Forja de Zuazo}
+				\tiny\url{https://github.com/oierlauzi/zuazo}
+			\end{block}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 %Termina el ducumento
