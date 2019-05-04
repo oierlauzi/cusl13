@@ -1,7 +1,8 @@
 \beamer@sectionintoc {1}{Introducci\IeC {\'o}n}{2}{0}{1}
 \beamer@sectionintoc {2}{Din\IeC {\'a}mica de Zuazo}{6}{0}{2}
-\beamer@sectionintoc {3}{Documentaci\IeC {\'o}n}{16}{0}{3}
-\beamer@sectionintoc {4}{E/S disponible y "procesadores"}{23}{0}{4}
-\beamer@sectionintoc {5}{Ejemplos}{38}{0}{5}
-\beamer@sectionintoc {6}{Aplicaciones}{47}{0}{6}
-\beamer@sectionintoc {7}{Conclusiones}{50}{0}{7}
+\beamer@sectionintoc {3}{Documentaci\IeC {\'o}n}{18}{0}{3}
+\beamer@sectionintoc {4}{E/S disponible y "procesadores"}{26}{0}{4}
+\beamer@sectionintoc {5}{Ejemplos}{42}{0}{5}
+\beamer@sectionintoc {6}{Futuro}{51}{0}{6}
+\beamer@sectionintoc {7}{Aplicaciones}{54}{0}{7}
+\beamer@sectionintoc {8}{Conclusiones}{57}{0}{8}

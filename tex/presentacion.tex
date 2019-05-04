@@ -46,9 +46,11 @@
 }
 
 %Estilo Tikz
+\tikzstyle{ZuazoBase}=[rectangle, draw=blue!60, fill=blue!5, very thick, minimum width=18mm, minimum height=18mm, font=\large]
+\tikzstyle{SourceBase}=[rectangle, draw=red!60, fill=red!5, very thick, minimum width=18mm, minimum height=18mm, font=\large]
+\tikzstyle{ConsumerBase}=[rectangle, draw=green!60, fill=green!5, very thick, minimum width=18mm, minimum height=18mm, font=\large]
 \tikzstyle{SourcePad}=[rectangle, draw=red!60, fill=red!5, thick, minimum height=3mm, font=\tiny]
 \tikzstyle{ConsumerPad}=[rectangle, draw=green!60, fill=green!5, thick, minimum height=3mm, font=\tiny]
-\tikzstyle{ZuazoBase}=[rectangle, draw=blue!60, fill=blue!5, very thick, minimum width=18mm, minimum height=18mm, font=\large]
 \tikzstyle{Flecha}=[->, line width=1.5]
 
 %Directorio de gráficos
@@ -57,12 +59,8 @@
 %Metadata
 \title{Zuazo}
 \subtitle{Librería para manipular video en tiempo real}
-\author[Oier Lauzirika Zarrabeitia]{Oier Lauzirika Zarrabeitia 
-	\\{
-		\small \href{mailto:oier.lauzirika.zarrabeitia@alumnos.upm.es}{oier.lauzirika.zarrabeitia@alumnos.upm.es}}
-	}
-	
-\institute[]{Estudiante de Ingeniería de Sonido e Imagen en la ETSI de Sistemas de Telecomunicación, Universidad Politécnica de Madrid}
+\author{Oier Lauzirika Zarrabeitia}
+\institute[]{Estudiante de Ingeniería de Sonido e Imagen en ETSIST-UPM}
 \date[FF del CUSL 13]{Fase final del CUSL 13, 10/05/2019} 
 
 %Al cominezo de cada sección
@@ -135,7 +133,6 @@
 		\item{GLFW3 (a reemplazar por SDL2)}
 		\item{FFmpeg}
 		\item{Magick++}
-		\item{nanoSVG (a reemplazar por rsvg)}
 		\item{V4L2}
 	\end{itemize}
 \end{frame}
@@ -176,14 +173,53 @@
 	\end{figure}
 \end{frame}
 
+\begin{frame}[fragile] \frametitle{Source / Consumer / Processor}
+	\begin{columns}
+		\begin{column}{0.48\textwidth}
+			\begin{block}{Source}
+				\center\begin{tikzpicture}
+					\node[ZuazoBase]	(source)							{Source};
+					\node[SourcePad]	(source_pad)	[right=0cm of source]	{SourcePad};
+				\end{tikzpicture}
+				\begin{itemize}
+					\item{Al menos un SourcePad}
+					\item{Ningún ConsumerPad}
+				\end{itemize}
+			\end{block}
+		\end{column}
+		\begin{column}{0.48\textwidth}
+			\begin{block}{Consumer}
+				\center\begin{tikzpicture}
+					\node[ZuazoBase]		(consumer)							{Consumer};
+					\node[ConsumerPad]	(consumer_pad)	[left=0cm of consumer]	{ConsumerPad};
+				\end{tikzpicture}
+				\begin{itemize}
+					\item{Al menos un ConsumerPad}
+					\item{Ningún SourcePad}
+				\end{itemize}
+			\end{block}
+		\end{column}
+	\end{columns}
+	\begin{block}{Processor} 
+		\center\begin{tikzpicture}
+			\node[ZuazoBase]		(processor)							{Processor};
+			\node[ConsumerPad]	(consumer_pad)	[left=0cm of processor]	{ConsumerPad};
+			\node[SourcePad]		(source_pad)		[right=0cm of processor]	{SourcePad};
+		\end{tikzpicture}
+		\begin{itemize}
+			\item{El resto}
+		\end{itemize}
+	\end{block}
+\end{frame}
+
 \begin{frame}[allowframebreaks, fragile] \frametitle{Dináminca de flujo}
 	\begin{figure} {Un "Consumer" puede ser alimentado de un "Source"}
 		\begin{tikzpicture}
 			%Nodos
 			\node[ZuazoBase]		(source)									{Source};
-			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{SourcePad};
 
-			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{consumerPad};
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{ConsumerPad};
 			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
 
 			%Lineas
@@ -205,9 +241,9 @@
 		\begin{tikzpicture}
 			%Nodos
 			\node[ZuazoBase]		(source)									{Source};
-			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{SourcePad};
 
-			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{consumerPad};
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of source_src]	{ConsumerPad};
 			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
 
 		\end{tikzpicture}
@@ -220,12 +256,12 @@
 		\begin{tikzpicture}
 			%Nodos
 			\node[ZuazoBase]		(source)										{Source};
-			\node[SourcePad]		(source_src)		[right = 0cm of source]			{sourcePad};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]			{SourcePad};
 
-			\node[ConsumerPad]	(consumer1_cons)	[above right=10mm of source_src] 	{consumerPad};
+			\node[ConsumerPad]	(consumer1_cons)	[above right=10mm of source_src] 	{ConsumerPad};
 			\node[ZuazoBase]		(consumer1)		[right=0cm of consumer1_cons]	{Consumer1};
 
-			\node[ConsumerPad]	(consumer2_cons)	[below right=10mm of source_src]	{consumerPad};
+			\node[ConsumerPad]	(consumer2_cons)	[below right=10mm of source_src]	{ConsumerPad};
 			\node[ZuazoBase]		(consumer2)		[right=0cm of consumer2_cons]	{Consumer2};
 
 			%Lineas
@@ -243,15 +279,15 @@
 		\begin{tikzpicture}
 			%Nodos
 			\node[ZuazoBase]		(source1)									{Source1};
-			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{sourcePad};
+			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{SourcePad};
 
 			\node[ZuazoBase]		(source2)			[below =1cm of source1]		{Source2};
-			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{sourcePad};
+			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{SourcePad};
 
-			\node[ConsumerPad]	(consumer1_cons)	[right=10mm of source1_src] 	{consumerPad};
+			\node[ConsumerPad]	(consumer1_cons)	[right=10mm of source1_src] 	{ConsumerPad};
 			\node[ZuazoBase]		(consumer1)		[right=0cm of consumer1_cons]{Consumer1};
 
-			\node[ConsumerPad]	(consumer2_cons)	[right=10mm of source2_src] 	{consumerPad};
+			\node[ConsumerPad]	(consumer2_cons)	[right=10mm of source2_src] 	{ConsumerPad};
 			\node[ZuazoBase]		(consumer2)		[right=0cm of consumer2_cons]{Consumer2};
 
 			%Lineas
@@ -270,13 +306,13 @@
 		\begin{tikzpicture}
 			%Nodos
 			\node[ZuazoBase]		(source)									{Source};
-			\node[SourcePad]		(source_src)		[right = 0cm of source]		{sourcePad};
+			\node[SourcePad]		(source_src)		[right = 0cm of source]		{SourcePad};
 
-			\node[ConsumerPad]	(processor_cons) 	[right = 4mm of source_src]	{consumerPad};
+			\node[ConsumerPad]	(processor_cons) 	[right = 4mm of source_src]	{ConsumerPad};
 			\node[ZuazoBase]		(processor)		[right = 0cm of processor_cons]	{Processor};
-			\node[SourcePad]		(processor_src)		[right = 0cm of processor)]	{sourcePad};	
+			\node[SourcePad]		(processor_src)		[right = 0cm of processor)]	{SourcePad};	
 
-			\node[ConsumerPad]	(consumer_cons)	[right=4mm of processor_src]	{consumerPad};
+			\node[ConsumerPad]	(consumer_cons)	[right=4mm of processor_src]	{ConsumerPad};
 			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
 
 			%Lineas
@@ -293,15 +329,15 @@
 	\begin{figure}  {Los "pipelines" pueden tener recursividad (hasta un nivel finito)}
 		\begin{tikzpicture}
 			%Nodos
-			\node[ConsumerPad]	(processor1_cons) 								{consumerPad};
+			\node[ConsumerPad]	(processor1_cons) 								{ConsumerPad};
 			\node[ZuazoBase]		(processor1)		[right = 0cm of processor1_cons]	{Processor1};
-			\node[SourcePad]		(processor1_src)	[right = 0cm of processor1)]		{sourcePad};	
+			\node[SourcePad]		(processor1_src)	[right = 0cm of processor1)]		{SourcePad};	
 
-			\node[ConsumerPad]	(processor2_cons) 	[below = 2cm of processor1_cons]	{consumerPad};
+			\node[ConsumerPad]	(processor2_cons) 	[below = 2cm of processor1_cons]	{ConsumerPad};
 			\node[ZuazoBase]		(processor2)		[right = 0cm of processor2_cons]	{Processor2};
-			\node[SourcePad]		(processor2_src)	[right = 0cm of processor2)]		{sourcePad};	
+			\node[SourcePad]		(processor2_src)	[right = 0cm of processor2)]		{SourcePad};	
 
-			\node[ConsumerPad]	(consumer_cons)	[right=3cm of processor1_src]		{consumerPad};
+			\node[ConsumerPad]	(consumer_cons)	[right=3cm of processor1_src]		{ConsumerPad};
 			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]		{Consumer};
 
 			%Lineas
@@ -323,12 +359,12 @@
 		\begin{tikzpicture}
 			%Nodos
 			\node[ZuazoBase]		(source1)									{Source1};
-			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{sourcePad};
+			\node[SourcePad]		(source1_src)		[right = 0cm of source1]		{SourcePad};
 
 			\node[ZuazoBase]		(source2)			[below =0.25cm of source1]		{Source2};
-			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{sourcePad};
+			\node[SourcePad]		(source2_src)		[right = 0cm of source2]		{SourcePad};
 
-			\node[ConsumerPad]	(consumer_cons)	[right=10mm of source1_src] 	{consumerPad};
+			\node[ConsumerPad]	(consumer_cons)	[right=10mm of source1_src] 	{ConsumerPad};
 			\node[ZuazoBase]		(consumer)		[right=0cm of consumer_cons]	{Consumer};
 
 			%Lineas
@@ -351,6 +387,29 @@
 	\end{figure}
 \end{frame}
 
+\begin{frame}[fragile] \frametitle{Clases base de Zuazo}
+	\begin{figure} 
+		\begin{tikzpicture}
+			\node[ZuazoBase]		(zuazo_base)											{ZuazoBase};
+		\end{tikzpicture}
+		\begin{tikzpicture}
+			\node[ZuazoBase]		(video_base)											{VideoBase};
+		\end{tikzpicture}
+	\end{figure}
+	\begin{figure} 
+		\begin{tikzpicture}
+			\node[SourceBase]		(video_source_base)										{VideoSourceBase};
+			\node[SourcePad]		(video_source_pad)		[right=0cm of video_source_base]		{videoOut};
+		\end{tikzpicture}
+	\end{figure}
+	\begin{figure} 
+		\begin{tikzpicture}
+			\node[ConsumerBase]	(video_consumer_base)									{VideoConsumerBase};
+			\node[ConsumerPad]	(video_consumer_pad)	[left=0cm of video_consumer_base]		{videoIn};
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
 %
 % Documentación
 %
@@ -361,11 +420,17 @@
 	\includegraphics[width=\textwidth]{doxy1} 
 \end{frame}
 
+\begin{frame}[allowframebreaks] \frametitle{ZuazoBase}
+	\center\includegraphics[width=\textwidth]{zuazo_base} 
+\end{frame}
+
 \begin{frame}[allowframebreaks] \frametitle{API general del video}
 \begin{center}
-	\includegraphics[height=0.8\textheight]{video_base1} 
+	\center\large\bf VideoBase\\
+	\includegraphics[height=0.75\textheight]{video_base1} 
 	\includegraphics[width=\textwidth]{video_base2} 
 	\includegraphics[height=0.8\textheight]{video_mode_struct} 
+	\center\large\bf VideoConsumer\\
 	\includegraphics[width=\textwidth]{video_consumer} 
 	\includegraphics[height=0.8\textheight]{scaling} 
 \end{center}
@@ -400,6 +465,7 @@
 		\item{Corrección de tono, saturación y luminosidad (HSL)} \pause
 		\item{Corrección de brillo y contraste} \pause
 		\item{Color a escala de grises} \pause
+		\item{Chroma key}  \pause
 		\item{Representación en luminancia del canal alpha}  \pause
 		\item{Invertir color} \pause
 		\item{A definir por el usuario}
@@ -434,34 +500,116 @@
 \end{frame}
 
 %
+% Conclusiones
+%
+\section{Futuro}
+
+%Cosas por hacer
+\begin{frame}[t] \frametitle{Cosas por hacer a corto plazo}
+	\begin{itemize}
+		\begin{item}
+			Cambiar librería de ventanas (GLFW3 por SDL2)
+			\begin{itemize}
+				\item{Permite integración con QT}
+				\item{Reescribir la clase "Window", con el debido soporte de pantalla completa y gestión de eventos}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			Completar efectos ya existentes
+			\begin{itemize}
+				\item{Mejor gestión de parámetros}
+				\item{Mayor número de parámetros}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			Más tipos de capas en el compositor
+			\begin{itemize}
+				\item{Capa de video deformable}
+				\item{Formas geométricas}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			Terminar de codificar los métodos \texttt{init()} y \texttt{terminate()}
+		\end{item}
+		\begin{item}
+			Añadir las extensiones que faltan a \texttt{videoSourceFromFile([...])}
+		\end{item}
+		\begin{item}
+			Añadir los comentarios de Doxygen
+		\end{item}
+	\end{itemize}
+\end{frame}
+
+%Cosas por hacer
+\begin{frame}[t] \frametitle{Cosas por hacer a largo plazo}
+	\begin{itemize}
+		\begin{item}
+			Añadir más entradas y salidas
+			\begin{itemize}
+				\item{Tarjetas Blackmagick Decklink}
+				\item{Salida a fichero de video por FFmpeg}
+				\item{E/S en streaming por FFmpeg}
+				\item{Superficie de Cairo}
+				\item{Generador de texto}
+				\item{Script personalizado de OpenGL}
+				\item{\ldots}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			Añadir más tipos de procesadores y efectos
+			\begin{itemize}
+				\item{Un \textit{keyer} completo, estilo compositor}
+				\item{\textit{Buffer} de fotogramas (para \textit{replays})}
+				\item{Efectos de difusión (Gaussiana, desenfoque...)}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			Añadir soporte para audio
+		\end{item}
+		\begin{item}
+			\ldots
+		\end{item}
+	\end{itemize}
+\end{frame}
+
+%
 % Aplicaciones
 %
 \section{Aplicaciones}
 
 %Posibles aplicaciones
-\begin{frame} \frametitle{Posibles aplicaciones}
-	%TODO
+\begin{frame}[t] \frametitle{Posibles aplicaciones}
+	\begin{itemize}
+		\begin{item}
+			Producción \textbf{lineal} de video (retransmisiones en directo)
+			\begin{itemize}
+				\item{Insertar gráficos}
+				\item{Conmutar entre entradas}
+				\item{Composiciones de múltiples entradas}
+				\item{Aplicar efectos}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			Realidad aumentada
+			\begin{itemize}
+				\item{Estudios virtuales}
+			\end{itemize}
+		\end{item}
+		\begin{item}
+			\ldots
+		\end{item}
+	\end{itemize}
 \end{frame}
 
 %Pero, ¿Se pueden hacer memes?
 \begin{frame} \frametitle{Pero, ¿Se pueden hacer memes?}
-	%TODO
+	%Esta diapositiva está en blanco deliberadamente
 \end{frame}
 
 %
 % Conclusiones
 %
 \section{Conclusiones}
-
-%Estado del arte
-\begin{frame} \frametitle{Estado del arte}
-	%TODO
-\end{frame}
-
-%Cosas por hacer
-\begin{frame} \frametitle{Cosas por hacer}
-	%TODO
-\end{frame}
 
 %Bugs
 \begin{frame} \frametitle{Bugs}
