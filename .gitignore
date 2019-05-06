@@ -3,8 +3,11 @@
 
 #Binarios
 code/Cuantizar
-code/CuantizarApp
 code/HolaMundo
+Presentacion
+
+#Visual Studio Code
+.vscode/*
 
 #Archivos creados por LaTex
 tex/presentacion.aux
@@ -16,3 +19,6 @@ tex/presentacion.snm
 tex/presentacion.synctex.gz
 tex/presentacion.toc
 tex/presentacion.vrb
+
+#Videos
+videos/*

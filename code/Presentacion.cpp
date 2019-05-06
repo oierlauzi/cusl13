@@ -16,6 +16,39 @@
 
 using namespace Zuazo; //Nos ahorrara muchos zz::
 
+
+struct CRSpecs{
+    float hueCenter;
+    float hueTol;
+    float hueDecay;
+
+    float satMin;
+    float satMax;
+    float satDecay;
+
+    float lumMin;
+    float lumMax;
+    float lumDecay;
+
+    float rad;
+
+    void setSpecs(zz::Processors::ChromaKey* ck){
+        ck->setHue(hueCenter);
+        ck->setHueTolerance(hueTol);
+        ck->setHueDecay(hueDecay);
+
+        ck->setMinimumSaturation(satMin);
+        ck->setMaximumSaturation(satMax);
+        ck->setSaturationDecay(satDecay);
+
+        ck->setMinimumLuminosity(lumMin);
+        ck->setMaximumLuminosity(lumMax);
+        ck->setLuminosityDecay(lumDecay);
+
+        ck->setRadius(rad);
+    }
+};
+
 /*
  * Directorios utiles
  */
@@ -27,9 +60,18 @@ const std::string bbbDir("videos/big_buck_bunny.mp4");
 /*
  * Variables globales
  */
-Video::DummyVideoPad salidaVideo;
-Utils::VideoMode defaultVideoMode;
-std::unique_ptr<Pdf> diapositivasPdf;
+zz::Utils::Vec2f                            resolucion;
+zz::Utils::VideoMode                        defaultVideoMode;
+
+zz::Video::DummyVideoPad                    salidaVideo;
+std::unique_ptr<Pdf>                        diapositivasPdf;
+
+std::unique_ptr<zz::Sources::FFmpeg>        player;
+std::unique_ptr<zz::Sources::ImageMagick>   image;
+std::unique_ptr<zz::Sources::V4L2>          webcam;
+
+std::unique_ptr<zz::Processors::ChromaKey>  chroma;
+std::unique_ptr<zz::Processors::Compositor> comp;
 
 /*
  * Diapositivas
@@ -50,12 +92,15 @@ int main(int argc, char* argv[]){
         //Crea dos ventanas para mostrar la salida
         Consumers::Window win1(windowVideoMode, "Ventana1");
         Consumers::Window win2(windowVideoMode, "Ventana2");
+        Consumers::Window win3(windowVideoMode, "ChromaOut");
         //Modo de escalado
         win1.setScalingMode(Utils::ScalingMode::Boxed);
         win2.setScalingMode(Utils::ScalingMode::Boxed);
+        win3.setScalingMode(Utils::ScalingMode::Boxed);
         //Filtro de escalado
         win1.setScalingFilter(Utils::ScalingFilter::Nearest);
         win2.setScalingFilter(Utils::ScalingFilter::Nearest);
+        win3.setScalingFilter(Utils::ScalingFilter::Nearest);
         //Establecer salida de video
         win1.videoIn << salidaVideo;
         win2.videoIn << salidaVideo;
@@ -98,6 +143,7 @@ int main(int argc, char* argv[]){
             .frameRate      =Utils::Rational(30.0),
             .progressive    =true //No nos importa
         };
+        resolucion=zz::Utils::Vec2f(defaultVideoMode.res.width, defaultVideoMode.res.height);
 
         //Carga el PDF
         std::cout << "Cargando el PDF..." << std::endl;
@@ -109,8 +155,38 @@ int main(int argc, char* argv[]){
         std::cout << "Cargando las diapositivas..." << std::endl;
         auto diapositivas=GET_PRESENTACION(zzcusl13);
         auto ite=diapositivas.begin();
-        (*ite)->onIn();
         std::cout << "Listo!" << std::endl;
+
+        //Abre los medios a utilizar
+        player=std::make_unique<Sources::FFmpeg>(bbbDir);
+        image=std::make_unique<Sources::ImageMagick>(urdinDir);
+        webcam=std::make_unique<Sources::V4L2>(webcamDir);
+
+        chroma=std::make_unique<Processors::ChromaKey>(defaultVideoMode);
+        comp=std::make_unique<Processors::Compositor>(defaultVideoMode);
+
+        //Pausa y reinicia el reproductor
+        player->setState(NonLinearUpdate::States::Paused);
+        player->gotoProgress(0.0);
+
+        //Configura el chroma
+        CRSpecs chromaParams{
+            .hueCenter      =110,   //Grados (Verde)
+            .hueTol         =30,    //Grados
+            .hueDecay       =10,    //Grados
+            .satMin         =0.5, 
+            .satMax         =1.0,
+            .satDecay       =0.2,
+            .lumMin         =0.3,
+            .lumMax         =0.7,
+            .lumDecay       =0.2,
+            .rad            =1
+        };
+        chromaParams.setSpecs(chroma.get());
+        win3.videoIn << chroma->videoOut;
+        chroma->videoIn << webcam->videoOut;
+
+        (*ite)->onIn();
     zz::end();
 
     char c;
@@ -143,10 +219,20 @@ int main(int argc, char* argv[]){
 
     //Cierra todo
     zz::begin();
+        (*ite)->onOut();
         diapositivas.clear();
         diapositivasPdf.reset();
+
+        player.reset();
+        image.reset();
+        webcam.reset();
+
+        chroma.reset();
+        comp.reset();
+
         win1.close();
         win2.close();
+        win3.close();
     zz::end();
 
     zz::terminate();
