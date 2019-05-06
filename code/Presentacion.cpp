@@ -174,13 +174,13 @@ int main(int argc, char* argv[]){
             .hueCenter      =110,   //Grados (Verde)
             .hueTol         =30,    //Grados
             .hueDecay       =10,    //Grados
-            .satMin         =0.5, 
+            .satMin         =0.6, 
             .satMax         =1.0,
-            .satDecay       =0.2,
-            .lumMin         =0.3,
-            .lumMax         =0.7,
-            .lumDecay       =0.2,
-            .rad            =1
+            .satDecay       =0.1,
+            .lumMin         =0.2,
+            .lumMax         =0.8,
+            .lumDecay       =0.1,
+            .rad            =0
         };
         chromaParams.setSpecs(chroma.get());
         win3.videoIn << chroma->videoOut;

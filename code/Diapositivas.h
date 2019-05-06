@@ -711,21 +711,21 @@ PRESENTACION_BEGIN(zzcusl13)
             vidPlane1->videoIn << player->videoOut;
             vidPlane1->setScalingMode(zz::Utils::ScalingMode::Boxed);
             vidPlane1->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
-            vidPlane1->setPosition(positions * zz::Utils::Vec3f(-0.4, -1.0, 1.0));
+            vidPlane1->setPosition(positions * zz::Utils::Vec3f(-0.4, -1.0, 0.9));
             vidPlane1->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
 
             auto vidPlane2=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane2->videoIn << image->videoOut;
             vidPlane2->setScalingMode(zz::Utils::ScalingMode::Boxed);
             vidPlane2->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
-            vidPlane2->setPosition(positions * zz::Utils::Vec3f(0.0, -1.0, 2.0));
+            vidPlane2->setPosition(positions * zz::Utils::Vec3f(0.0, -1.0, 1.8));
             vidPlane2->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
 
             auto vidPlane3=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane3->videoIn << chroma->videoOut;
             vidPlane3->setScalingMode(zz::Utils::ScalingMode::Boxed);
             vidPlane3->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
-            vidPlane3->setPosition(positions * zz::Utils::Vec3f(0.4, -1.0, 3.0));
+            vidPlane3->setPosition(positions * zz::Utils::Vec3f(0.4, -1.0, 2.7));
             vidPlane3->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
 
             //Mete las capas en el compositor
@@ -737,7 +737,7 @@ PRESENTACION_BEGIN(zzcusl13)
             comp->setLayers(capas);
 
             //Coloca la cámara
-            zz::Utils::Vec3f camPos=comp->getCameraPosition() + zz::Utils::Vec3f(bkgdRect.size, bkgdRect.size.x) / 2.2f;
+            zz::Utils::Vec3f camPos=comp->getCameraPosition() + zz::Utils::Vec3f(bkgdRect.size / 1.3f, bkgdRect.size.x) / 2.2f;
             zz::Utils::Vec3f target(0.0f, -vidPlaneRect.size.y * 0.5, vidPlaneRect.size.x);
             comp->setCameraPosition(camPos);
             comp->setCameraTarget(target);
@@ -910,6 +910,7 @@ PRESENTACION_BEGIN(zzcusl13)
     DEFAULT_DIAPOSITIVA(Diapositiva58, 55)
 
     //Diapositiva59
+    //TODO MEME
 
     //Diapositiva60
     DEFAULT_DIAPOSITIVA(Diapositiva60, 56)
