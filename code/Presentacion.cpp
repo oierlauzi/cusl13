@@ -53,9 +53,9 @@ struct CRSpecs{
  * Directorios utiles
  */
 const std::string pdfDir("tex/presentacion.pdf");
-const std::string webcamDir("/dev/video0");
+const std::string webcamDir("/dev/video2");
 const std::string urdinDir("images/urdin.jpg");
-const std::string bbbDir("videos/big_buck_bunny.mp4");
+const std::string bbbDir("videos/big_buck_bunny.mov");
 
 /*
  * Variables globales
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]){
 
     std::cout << "Indice de la pantalla para Ventana1:";
     int scr=-1;
-    //std::cin >> scr; std::cin.get(); ///////////////////////////////////////  DESCOMENTAR!!!!
+    std::cin >> scr; std::cin.get();
 
     zz::begin();
         if(scr >= 0 && scr < (int)pantallas.size()){
@@ -171,10 +171,10 @@ int main(int argc, char* argv[]){
 
         //Configura el chroma
         CRSpecs chromaParams{
-            .hueCenter      =110,   //Grados (Verde)
+            .hueCenter      =150,   //Grados (Verde)
             .hueTol         =30,    //Grados
             .hueDecay       =10,    //Grados
-            .satMin         =0.6, 
+            .satMin         =0.2, 
             .satMax         =1.0,
             .satDecay       =0.1,
             .lumMin         =0.2,
@@ -185,6 +185,17 @@ int main(int argc, char* argv[]){
         chromaParams.setSpecs(chroma.get());
         win3.videoIn << chroma->videoOut;
         chroma->videoIn << webcam->videoOut;
+
+        //Configura la webcam
+        zz::Utils::VideoMode webcamVideMode{
+            .pixFmt         =Utils::PixelFormats::PIX_FMT_NONE,
+            .res            =zz::Utils::Resolution(1280, 720),
+            .codec          =Utils::Codecs::CODEC_MJPEG,
+            .frameRate      =Utils::Rational(30.0),
+            .progressive    =true //No nos importa
+        };
+
+        webcam->setVideoMode(webcamVideMode);
 
         (*ite)->onIn();
     zz::end();
