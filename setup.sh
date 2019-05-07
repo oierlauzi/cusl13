@@ -3,13 +3,14 @@
 #Descargar archivos necesarios
 echo "Descargando archivos necesarios..."
 mkdir videos
-wget https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov
-mv big_buck_bunny_1080p_h264.mov videos/big_buck_bunny.mov
+wget https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_h264.mov
+mv big_buck_bunny_480p_h264.mov videos/big_buck_bunny.mov
 
 #Compila la presentación de LaTex
 echo "Compilando el la presentación en LaTex..."
 cd tex
 pdflatex presentacion.tex
+pdflatex presentacion.tex #Hace 2 veces para mostrar correctamente la numeracion
 cd ..
 
 #Compila todo el código necesario

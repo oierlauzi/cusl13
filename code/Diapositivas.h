@@ -128,13 +128,14 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
 
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << player->videoOut;
@@ -176,6 +177,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << image->videoOut;
@@ -209,13 +211,14 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
 
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << webcam->videoOut;
@@ -258,12 +261,13 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << m_fx->videoOut;
@@ -310,6 +314,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << m_fx->videoOut;
@@ -348,12 +353,13 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << m_fx->videoOut;
@@ -389,12 +395,13 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << chroma->videoOut;
@@ -432,12 +439,13 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << m_fx->videoOut;
@@ -476,12 +484,13 @@ PRESENTACION_BEGIN(zzcusl13)
             };
 
             zz::Graphics::Rectangle vidPlaneRect{
-                .size=resolucion / 2.0f
+                .size=resolucion / 3.0f
             };
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane->videoIn << m_fx->videoOut;
@@ -529,6 +538,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane1=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane1->videoIn << player->videoOut;
@@ -586,6 +596,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane1=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane1->videoIn << player->videoOut;
@@ -643,6 +654,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto vidPlane1=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
             vidPlane1->videoIn << player->videoOut;
@@ -704,6 +716,7 @@ PRESENTACION_BEGIN(zzcusl13)
             //Crea y configura las capas
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
 
@@ -790,6 +803,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto window=std::make_shared<zz::Processors::Compositor::VideoLayer>(winRect);
             window->videoIn << winImg->videoOut;
@@ -864,6 +878,7 @@ PRESENTACION_BEGIN(zzcusl13)
             auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
             bkgd->videoIn << diapositivasPdf->videoOut;
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
             auto window=std::make_shared<zz::Processors::Compositor::VideoLayer>(winRect);
             window->videoIn << winImg->videoOut;
