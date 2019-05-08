@@ -55,7 +55,7 @@ struct CRSpecs{
 const std::string pdfDir("tex/presentacion.pdf");
 const std::string webcamDir("/dev/video2");
 const std::string urdinDir("images/urdin.jpg");
-const std::string bbbDir("videos/big_buck_bunny.mov");
+const std::string bbbDir("videos/big_buck_bunny.ogg");
 
 /*
  * Variables globales
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]){
 
     //Establecemos un modo de video para las ventanas
     Utils::VideoMode windowVideoMode{
-        .res            =Utils::Resolution(1280, 960),
+        .res            =Utils::Resolution(1024, 768),
         .frameRate      =Utils::Rational(30.0),
     };
 
@@ -136,20 +136,21 @@ int main(int argc, char* argv[]){
         win1.setFramerate(Utils::Rational(30.0)); //30Hz si o si, sino mi portatil sufre
         const auto& resolution=win1.getResolution();
 
-        defaultVideoMode=Utils::VideoMode{
-            .pixFmt         =Utils::PixelFormats::PIX_FMT_RGB32,
-            .res            =resolution,
-            .codec          =Utils::Codecs::CODEC_NONE, //No nos importa
-            .frameRate      =Utils::Rational(30.0),
-            .progressive    =true //No nos importa
-        };
-        resolucion=zz::Utils::Vec2f(defaultVideoMode.res.width, defaultVideoMode.res.height);
-
         //Carga el PDF
         std::cout << "Cargando el PDF..." << std::endl;
         double ppi=resolution.height * 25.4 / 96; //Altura por defecto en beamer = 96mm; 1in = 25.4mm
         diapositivasPdf=std::unique_ptr<Pdf>(new Pdf(pdfDir, round(ppi)));
         std::cout << "Listo! PPI:" << ppi << std::endl;
+
+        //Establece un modo de video por defecto
+        defaultVideoMode=Utils::VideoMode{
+            .pixFmt         =Utils::PixelFormats::PIX_FMT_RGB32,
+            .res            =diapositivasPdf->getResolution(),
+            .codec          =Utils::Codecs::CODEC_NONE, //No nos importa
+            .frameRate      =Utils::Rational(30.0),
+            .progressive    =true //No nos importa
+        };
+        resolucion=zz::Utils::Vec2f(defaultVideoMode.res.width, defaultVideoMode.res.height);
 
         //Carga las diapositivas
         std::cout << "Cargando las diapositivas..." << std::endl;

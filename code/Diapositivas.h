@@ -38,7 +38,6 @@ extern std::unique_ptr<zz::Processors::Compositor> comp;
  */
 
 PRESENTACION_BEGIN(zzcusl13)
-
     //Diapositiva1
     DEFAULT_DIAPOSITIVA(Diapositiva1, 1)
 
@@ -387,8 +386,11 @@ PRESENTACION_BEGIN(zzcusl13)
     //Diapositiva34
     DIAP_BEGIN(Diapositiva34)
         DIAP_PRIV_OBJ_BEGIN
+            std::unique_ptr<zz::Sources::ImageMagick> tiempoImg;
         DIAP_PRIV_OBJ_END
         DIAP_ONIN_BEGIN
+            tiempoImg=std::make_unique<zz::Sources::ImageMagick>("images/tiempo.jpg");
+
             //Establece los tamaños
             zz::Graphics::Rectangle bkgdRect{
                 .size=resolucion
@@ -403,16 +405,23 @@ PRESENTACION_BEGIN(zzcusl13)
             bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
             bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
 
-            auto vidPlane=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
-            vidPlane->videoIn << chroma->videoOut;
-            vidPlane->setScalingMode(zz::Utils::ScalingMode::Boxed);
-            vidPlane->setPosition(zz::Utils::Vec3f(0, -resolucion.y / 4.0f, 1.0));
-            vidPlane->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
+            auto tiempoLay=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
+            tiempoLay->videoIn << tiempoImg->videoOut;
+            tiempoLay->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            tiempoLay->setPosition(zz::Utils::Vec3f(0, -resolucion.y / 4.0f, 1.0));
+            tiempoLay->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
+
+            auto chromaLay=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
+            chromaLay->videoIn << chroma->videoOut;
+            chromaLay->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            chromaLay->setPosition(zz::Utils::Vec3f(0, -resolucion.y / 4.0f, 2.0));
+            chromaLay->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
 
             //Mete las capas en el compositor
             std::vector<std::shared_ptr<zz::Processors::Compositor::LayerBase>> capas;
             capas.push_back(bkgd);
-            capas.push_back(vidPlane);
+            capas.push_back(tiempoLay);
+            capas.push_back(chromaLay);
             comp->setLayers(capas);
 
             salidaVideo<<comp->videoOut;
@@ -420,6 +429,7 @@ PRESENTACION_BEGIN(zzcusl13)
         DIAP_ONIN_END
         DIAP_ONOUT_BEGIN
             salidaVideo<<nullptr;
+            tiempoImg.reset();
         DIAP_ONOUT_END
     DIAP_END(Diapositiva34)
 
@@ -695,11 +705,6 @@ PRESENTACION_BEGIN(zzcusl13)
     //Diapositiva41
     DIAP_BEGIN(Diapositiva41)
         DIAP_PRIV_OBJ_BEGIN
-            std::unique_ptr<zz::Processors::Compositor> m_comp;
-            std::unique_ptr<zz::Video::VideoSourceBase> m_src1;
-            std::unique_ptr<zz::Video::VideoSourceBase> m_src2;
-            std::unique_ptr<zz::Video::VideoSourceBase> m_src3;
-            std::unique_ptr<zz::Processors::ChromaKey>  m_chroma;
         DIAP_PRIV_OBJ_END
         DIAP_ONIN_BEGIN
             //Establece los tamaños
@@ -925,10 +930,106 @@ PRESENTACION_BEGIN(zzcusl13)
     DEFAULT_DIAPOSITIVA(Diapositiva58, 55)
 
     //Diapositiva59
-    //TODO MEME
+    DEFAULT_DIAPOSITIVA(Diapositiva59, 56)
 
     //Diapositiva60
-    DEFAULT_DIAPOSITIVA(Diapositiva60, 56)
+    DIAP_BEGIN(Diapositiva60)
+        DIAP_PRIV_OBJ_BEGIN
+            std::unique_ptr<zz::Sources::ImageMagick> text;
+            std::unique_ptr<zz::Sources::ImageMagick> t1;
+            std::unique_ptr<zz::Sources::ImageMagick> t2;
+            std::unique_ptr<zz::Sources::ImageMagick> t3;
+            std::unique_ptr<zz::Sources::ImageMagick> t4;
+        DIAP_PRIV_OBJ_END
+        DIAP_ONIN_BEGIN
+            //Abre las imagenes
+            text=std::make_unique<zz::Sources::ImageMagick>("images/meme_title.png");
+            t1=std::make_unique<zz::Sources::ImageMagick>("images/meme_t1.jpg");
+            t2=std::make_unique<zz::Sources::ImageMagick>("images/meme_t2.jpg");
+            t3=std::make_unique<zz::Sources::ImageMagick>("images/meme_t3.jpg");
+            t4=std::make_unique<zz::Sources::ImageMagick>("images/meme_t4.jpg");
+
+            //Establece los tamaños
+            zz::Graphics::Rectangle bkgdRect{
+                .size=resolucion
+            };
+
+            zz::Graphics::Rectangle textRect{
+                .size=zz::Utils::Vec2f(resolucion.x * 0.8, resolucion.y * 0.15)
+            };
+
+            zz::Graphics::Rectangle vidPlaneRect{
+                .size=resolucion / 4.0f
+            };
+
+            //Crea y configura las capas
+            auto bkgd=std::make_shared<zz::Processors::Compositor::VideoLayer>(bkgdRect);
+            bkgd->videoIn << diapositivasPdf->videoOut;
+            bkgd->setAnchorage(zz::Utils::Vec3f(bkgdRect.size / 2.0f, 0.0));
+            bkgd->setScalingMode(zz::Utils::ScalingMode::Boxed);
+
+            zz::Utils::Vec3f texPos(0.0, resolucion.y / 4.0f, 1.0);
+
+            auto txt=std::make_shared<zz::Processors::Compositor::VideoLayer>(textRect);
+            txt->videoIn << text->videoOut;
+            txt->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            txt->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
+            txt->setPosition(texPos);
+            txt->setAnchorage(zz::Utils::Vec3f(textRect.size / 2.0f, 0.0));
+
+            zz::Utils::Vec3f positions(vidPlaneRect.size / 1.9f, 1.0);
+            zz::Utils::Vec3f posDesp(0.0, -resolucion.y / 8.0f, 0.0);
+
+            auto vidPlane1=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
+            vidPlane1->videoIn << t1->videoOut;
+            vidPlane1->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            vidPlane1->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
+            vidPlane1->setPosition(positions * zz::Utils::Vec3f(-1.0, -1.0, 1.0) + posDesp);
+            vidPlane1->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
+
+            auto vidPlane2=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
+            vidPlane2->videoIn << t2->videoOut;
+            vidPlane2->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            vidPlane2->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
+            vidPlane2->setPosition(positions * zz::Utils::Vec3f(-1.0, +1.0, 1.0) + posDesp);
+            vidPlane2->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
+
+            auto vidPlane3=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
+            vidPlane3->videoIn << t3->videoOut;
+            vidPlane3->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            vidPlane3->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
+            vidPlane3->setPosition(positions * zz::Utils::Vec3f(+1.0, -1.0, 1.0) + posDesp);
+            vidPlane3->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
+
+            auto vidPlane4=std::make_shared<zz::Processors::Compositor::VideoLayer>(vidPlaneRect);
+            vidPlane4->videoIn << t4->videoOut;
+            vidPlane4->setScalingMode(zz::Utils::ScalingMode::Boxed);
+            vidPlane4->setScalingFilter(zz::Utils::ScalingFilter::Bilinear);
+            vidPlane4->setPosition(positions * zz::Utils::Vec3f(+1.0, +1.0, 1.0) + posDesp);
+            vidPlane4->setAnchorage(zz::Utils::Vec3f(vidPlaneRect.size / 2.0f, 0.0));
+
+            //Mete las capas en el compositor
+            std::vector<std::shared_ptr<zz::Processors::Compositor::LayerBase>> capas;
+            capas.push_back(bkgd);
+            capas.push_back(txt);
+            capas.push_back(vidPlane1);
+            capas.push_back(vidPlane2);
+            capas.push_back(vidPlane3);
+            capas.push_back(vidPlane4);
+            comp->setLayers(capas);
+
+            salidaVideo<<comp->videoOut;
+            diapositivasPdf->ir_a(56);
+        DIAP_ONIN_END
+        DIAP_ONOUT_BEGIN
+            salidaVideo<<nullptr;
+            text.reset();
+            t1.reset();
+            t2.reset();
+            t3.reset();
+            t4.reset();
+        DIAP_ONOUT_END
+    DIAP_END(Diapositiva60)
 
     //Diapositiva61
     DEFAULT_DIAPOSITIVA(Diapositiva61, 57)

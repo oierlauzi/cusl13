@@ -35,7 +35,11 @@ public:
     void anterior(){
         m_nHoja--;
         cargar();
-    }                        
+    }
+
+    zz::Utils::Resolution getResolution() const{
+        return m_imzz.getResolution();
+    }                  
 private:
     int                         m_nHoja;
     std::vector<Magick::Image>  m_hojas; 

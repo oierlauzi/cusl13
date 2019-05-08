@@ -3,8 +3,12 @@
 #Descargar archivos necesarios
 echo "Descargando archivos necesarios..."
 mkdir videos
-wget https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_h264.mov
-mv big_buck_bunny_480p_h264.mov videos/big_buck_bunny.mov
+wget https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.ogg
+mv big_buck_bunny_720p_stereo.ogg videos/big_buck_bunny.
+
+DATE=$(date +'%Y%m%d')
+wget "http://www.aemet.es/imagenes_d/eltiempo/prediccion/espa/${DATE}1224_p01wesp0.jpg"
+mv ${DATE}1224_p01wesp0.jpg images/tiempo.jpg
 
 #Compila la presentación de LaTex
 echo "Compilando el la presentación en LaTex..."
